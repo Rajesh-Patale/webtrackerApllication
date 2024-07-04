@@ -47,4 +47,9 @@ public class ScreenActivityController {
 	        screenActivityService.deleteScreenActivity(id);
 	    }
 
+	@GetMapping("/total/{username}")
+	public long getTotalScreenTime(@PathVariable String username) {
+		return screenActivityService.getTotalScreenTime(username);
+	}
+
 }
