@@ -3,15 +3,8 @@ package com.webtracker.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import com.webtracker.entity.User;
 import com.webtracker.service.UserService;
@@ -48,4 +41,16 @@ public class UserController {
 	        userService.deleteUser(id);
 	    }
 
+	@GetMapping("/login")
+	public ResponseEntity<User> login(@RequestParam String username, @RequestParam String password, @RequestParam Double latitude, @RequestParam Double longitude) {
+		User user = userService.login(username, password, latitude, longitude);
+		return ResponseEntity.ok(user);
+	}
+
+	@GetMapping("/logout")
+	public ResponseEntity<String> logout(@RequestParam Long userId, @RequestParam Double latitude, @RequestParam Double longitude) {
+		User user = userService.getUserById(userId);
+		userService.logout(user, latitude, longitude);
+		return ResponseEntity.ok("Logged out successfully");
+	}
 }
