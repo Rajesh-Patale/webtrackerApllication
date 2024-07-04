@@ -1,7 +1,10 @@
 package com.webtracker.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import com.webtracker.entity.Location;
+import com.webtracker.repository.LocationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +16,9 @@ public class UserService {
 	
 	  @Autowired
 	    private UserRepository userRepository;
+
+	@Autowired(required = true)
+	private LocationRepository locationRepository;
 
 	    public List<User> getAllUsers() {
 	        return userRepository.findAll();
@@ -40,4 +46,25 @@ public class UserService {
 	        userRepository.deleteById(id);
 	    }
 
+	public User login(String username, String password, Double latitude, Double longitude) {
+		User user = userRepository.findByUsername(username);
+		if (user != null && user.getPassword().equals(password)) {
+			saveLocation(user, latitude, longitude);
+			return user;
+		}
+		throw new RuntimeException("Invalid login");
+	}
+
+	public void logout(User user, Double latitude, Double longitude) {
+		saveLocation(user, latitude, longitude);
+	}
+
+	private void saveLocation(User user, Double latitude, Double longitude) {
+		Location location = new Location();
+		location.setUser(user);
+		location.setLatitude(latitude);
+		location.setLongitude(longitude);
+		location.setTimestamp(LocalDateTime.now());
+		locationRepository.save(location);
+	}
 }
