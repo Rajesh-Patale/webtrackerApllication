@@ -52,13 +52,13 @@ public class ScreenActivityService {
         screenActivityRepository.deleteById(id);
     }
 
-    public long getTotalScreenTime(String username) {
-        User user = userRepository.findByUsername(username);
-        List<Timesheet> projectTimes = timesheetRepository.findByUser(user);
-
-        return projectTimes.stream()
-                .mapToLong(pt -> Duration.between(pt.getLoginTime(), pt.getLogoutTime()).toMinutes())
-                .sum();
-    }
+//    public long getTotalScreenTime(String username) {
+//        User user = userRepository.findByUsername(username);
+//        List<Timesheet> projectTimes = timesheetRepository.findByUser(user);
+//
+//        return projectTimes.stream()
+//                .mapToLong(pt -> Duration.between(pt.getLoginTime(), pt.getLogoutTime()).toMinutes())
+//                .sum();
+//    }
 
 }
