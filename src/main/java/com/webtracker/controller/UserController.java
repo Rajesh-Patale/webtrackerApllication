@@ -5,6 +5,8 @@ import com.webtracker.entity.Location;
 import com.webtracker.entity.User;
 import com.webtracker.service.LocationService;
 import com.webtracker.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,8 @@ import java.util.regex.Pattern;
 @RequestMapping("/api/users")
 @CrossOrigin("*")
 public class UserController {
+
+    final Logger logger = LoggerFactory.getLogger(UserService.class);
     @Autowired
     private UserService userService;
 
@@ -31,7 +35,7 @@ public class UserController {
         return matcher.matches();
     }
 
-    @PostMapping("/register")
+    @PostMapping("/user/register")
     public ResponseEntity<?> registerUser(@RequestBody User user) throws Exception{
         if (!isValidEmail(user.getEmail())) {
             return new ResponseEntity<>("enter valid userId", HttpStatus.BAD_REQUEST);
@@ -45,7 +49,20 @@ public class UserController {
         return ResponseEntity.ok(userService.saveUser(user));
     }
 
-    @GetMapping("/{email}")
+    @PostMapping("/user/addAdmin")
+    public ResponseEntity<User> addAdmin(@RequestBody User userDetails) {
+        logger.info("Adding admin user with details: {}", userDetails);
+        try {
+            // Save the admin details
+            User savedAdmin = userService.saveAdmin(userDetails);
+            return ResponseEntity.ok(savedAdmin);
+        } catch (Exception e) {
+            logger.error("Error adding admin user: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping("/user/{email}")
     public ResponseEntity<User> searchUser(@PathVariable String email) {
         User user = userService.findByEmail(email);
         if (user == null) {
@@ -54,14 +71,14 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/getAllUser")
+    @GetMapping("/admin/getAllUser")
     public ResponseEntity<List<User>> searchAllUser() throws Exception
     {
         List<User> users = userService.getAllUser();
         return new ResponseEntity<List<User>>(users, HttpStatus.OK);
     }
 
-    @PostMapping("/loginUser")
+    @PostMapping("/user/loginUser")
     public User loginUser(@RequestBody User user) throws Exception
     {
         String currEmail = user.getEmail();
@@ -84,19 +101,19 @@ public class UserController {
         return userObj;
     }
 
-    @PostMapping("/saveLocation")
+    @PostMapping("/user/saveLocation")
     public String saveLocation(@RequestBody Location location) {
         locationService.saveLocation(location);
         return "Location saved successfully!";
     }
 
-    @GetMapping("/getLocation/{userEmail}")
+    @GetMapping("/user/getLocation/{userEmail}")
     public Location getLocation(@PathVariable String userEmail){
         System.out.println(locationService.getLocation(userEmail));
         return locationService.getLocation(userEmail);
     }
 
-    @PostMapping("/logoutUser")
+    @PostMapping("/user/logoutUser")
     public User logOutUser(@RequestBody User user) throws Exception
     {
          User usr=userService.findByEmail(user.getEmail());
